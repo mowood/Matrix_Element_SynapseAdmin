@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: matrix-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: synapse
+      POSTGRES_USER: synapse
+      POSTGRES_PASSWORD: matrix_password_123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synapse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  synapse:
+    image: matrixdotorg/synapse:latest
+    container_name: matrix-synapse
+    restart: unless-stopped
+    ports:
+      - "8008:8008"
+    environment:
+      - SYNAPSE_SERVER_NAME= YOUR_IP
+      - SYNAPSE_REPORT_STATS=no
+    volumes:
+      - /home/zabbix/matrix-server/synapse-data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  element:
+    image: vectorim/element-web:latest
+    container_name: matrix-element
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - DEFAULT_SERVER_NAME=YOUR_IP
+      - DEFAULT_SERVER_URL=http://YOUR_IP:8008
+
+  synapse-admin:
+    image: awesometechnologies/synapse-admin:latest
+    container_name: matrix-synapse-admin
+    restart: unless-stopped
+    ports:
+      - "8765:80"
+    environment:
+      - REACT_APP_SYNAPSE_URL=http://YOUR_IP:8008
+
+volumes:
+  postgres_data:
