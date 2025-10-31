@@ -129,13 +129,13 @@ docker exec -it matrix-synapse register_new_matrix_user \
 
 # 🌐 Способы входа и создания пользователей
 ## Способ 1: Через Element Web (рекомендуется)
-Откройте Element Web: http://10.41.164.21:8080
+Откройте Element Web: http://YOUR_IP:8080
 
 На странице входа:
 
 Нажмите "Edit" рядом с "Sign in to matrix.org"
 
-Введите ваш сервер: 10.41.164.21
+Введите ваш сервер: YOUR_IP
 
 Нажмите "Continue"
 
