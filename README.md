@@ -26,7 +26,7 @@ docker run --rm \
 ## Проверьте что файлы создались
 `ls -la synapse-data/`
 # Шаг 3: Исправление конфига для PostgreSQL
-bash
+ 
 ## Создайте правильный конфиг homeserver.yaml
 ```
 docker run --rm -v $(pwd)/synapse-data:/data -it alpine sh -c 'cat > /data/homeserver.yaml' << 'EOF'
@@ -95,9 +95,9 @@ EOF
 ✅ matrix-synapse-admin - должен быть зеленым
 
 # Шаг 6: Создание администратора
-bash
+ 
 ## Дождитесь полного запуска Synapse (2-3 минуты)
-sleep 180
+`sleep 180`
 
 ## Создайте администратора
 ```
@@ -152,7 +152,7 @@ Confirm password: повторите пароль
 Нажмите "Register"
 
 # Способ 2: Через команды (если регистрация отключена)
-bash
+ 
 ## Создание пользователя через консоль
 ```
 docker exec -it matrix-synapse register_new_matrix_user \
@@ -200,9 +200,9 @@ docker exec -it matrix-synapse register_new_matrix_user \
 🔧 Если команда создания администратора не работает
 Попробуйте альтернативный синтаксис:
 
-bash
+ 
 ## Альтернативный способ
-`docker exec -it matrix-synapse bash`
+`docker exec -it matrix-synapse  `
 
 ## Внутри контейнера:
 `register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml -u admin -p admin123 -a`
@@ -212,7 +212,7 @@ bash
 `sleep 10`
 `register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml -u admin -p admin123 -a`
 📋 Быстрая проверка доступности сервера
-bash
+ 
 ## Проверьте что Synapse отвечает
 `curl http://localhost:8008/_matrix/client/versions`
 
