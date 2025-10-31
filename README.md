@@ -79,7 +79,7 @@ EOF
 
 Выберите "Web editor"
 
-Вставьте этот docker-compose.yml:
+Вставьте этот скаченный docker-compose.yml или создайте новый
 
 Нажмите "Deploy the stack"
 
