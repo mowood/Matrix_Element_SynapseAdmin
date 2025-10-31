@@ -1,27 +1,34 @@
-🚀 Полная установка Matrix через Portainer
+🚀 Полная локальная установка Matrix + Element + Synapse Admin c помощью Docker + Portainer
+
 # Шаг 1: Подготовка на сервере
-bash
+
 ## Залогиньтесь на сервер и создайте рабочую директорию
+```
 mkdir ~/matrix-server
 cd ~/matrix-server
+```
 
 ## Создайте директорию для данных Synapse
+```
 mkdir synapse-data
 chmod 755 synapse-data
+```
 # Шаг 2: Генерация конфигурации Synapse
-bash
+
 ## Сгенерируйте базовую конфигурацию
+```
 docker run --rm \
   -v $(pwd)/synapse-data:/data \
   -e SYNAPSE_SERVER_NAME=YOUR_IP \
   -e SYNAPSE_REPORT_STATS=no \
   matrixdotorg/synapse:latest generate
-
+```
 ## Проверьте что файлы создались
-ls -la synapse-data/
+`ls -la synapse-data/`
 # Шаг 3: Исправление конфига для PostgreSQL
 bash
 ## Создайте правильный конфиг homeserver.yaml
+```
 docker run --rm -v $(pwd)/synapse-data:/data -it alpine sh -c 'cat > /data/homeserver.yaml' << 'EOF'
 server_name: "YOUR_IP"
 report_stats: false
@@ -61,6 +68,7 @@ trusted_key_servers:
 
 suppress_key_server_warning: false
 EOF
+```
 
 # Шаг 4: Настройка в Portainer
 Откройте Portainer: http://YOUR_IP:9000
@@ -92,12 +100,14 @@ bash
 sleep 180
 
 ## Создайте администратора
+```
 docker exec -it matrix-synapse register_new_matrix_user \
   http://localhost:8008 \
   -c /data/homeserver.yaml \
   -u admin \
   -p admin_password_123 \
   -a
+```
 # Шаг 7: Проверка доступа
 После успешного создания администратора откройте в браузере:
 
@@ -109,13 +119,13 @@ docker exec -it matrix-synapse register_new_matrix_user \
 
 # 🔧 Если возникли проблемы
 Проверка логов:
-bash
+
 ## В Portainer или через терминал
-docker logs matrix-synapse --tail 50
+`docker logs matrix-synapse --tail 50`
 Проверка конфига:
-bash
+
 ## Убедитесь что конфиг правильный
-docker exec matrix-synapse cat /data/homeserver.yaml | grep -A 10 "database:"
+`docker exec matrix-synapse cat /data/homeserver.yaml | grep -A 10 "database:"`
 
 # 🌐 Способы входа и создания пользователей
 ## Способ 1: Через Element Web (рекомендуется)
@@ -144,32 +154,36 @@ Confirm password: повторите пароль
 # Способ 2: Через команды (если регистрация отключена)
 bash
 ## Создание пользователя через консоль
+```
 docker exec -it matrix-synapse register_new_matrix_user \
   http://localhost:8008 \
   -c /data/homeserver.yaml \
   -u username \
   -p password \
   --no-admin
-
+```
 ## Пример создания тестового пользователя
+```
 docker exec -it matrix-synapse register_new_matrix_user \
   http://localhost:8008 \
   -c /data/homeserver.yaml \
   -u testuser \
   -p testpassword123 \
   --no-admin
+```
 # Способ 3: Создание администратора
-bash
+
 ## Создание пользователя с правами администратора
+```
 docker exec -it matrix-synapse register_new_matrix_user \
   http://localhost:8008 \
   -c /data/homeserver.yaml \
   -u admin \
   -p admin_password_123 \
   -a
-
+```
 # 🛠 Администрирование через Synapse Admin
-Откройте Synapse Admin: http://10.41.164.21:8765
+Откройте Synapse Admin: http://YOUR_IP:8765
 
 Войдите с учетной записью администратора
 
@@ -188,22 +202,22 @@ docker exec -it matrix-synapse register_new_matrix_user \
 
 bash
 ## Альтернативный способ
-docker exec -it matrix-synapse bash
+`docker exec -it matrix-synapse bash`
 
 ## Внутри контейнера:
-register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml -u admin -p admin123 -a
+`register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml -u admin -p admin123 -a`
 
 ## Или если это не работает:
-python -m synapse.app.homeserver --config-path /data/homeserver.yaml &
-sleep 10
-register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml -u admin -p admin123 -a
+`python -m synapse.app.homeserver --config-path /data/homeserver.yaml &`
+`sleep 10`
+`register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml -u admin -p admin123 -a`
 📋 Быстрая проверка доступности сервера
 bash
 ## Проверьте что Synapse отвечает
-curl http://localhost:8008/_matrix/client/versions
+`curl http://localhost:8008/_matrix/client/versions`
 
 ## Проверьте что Element доступен
-curl -I http://localhost:8080
+`curl -I http://localhost:8080`
 
 ## Проверьте что Synapse Admin доступен  
-curl -I http://localhost:8765
+`curl -I http://localhost:8765`
